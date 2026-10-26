@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="深夜手当にも対応した無料のバイト給与計算ツール。シフトを保存して月収の目安を確認できます。" />
+  <title>シフトノート v2｜バイト給与計算</title>
+  <style>
+    :root{--bg:#f6f8fc;--ink:#152342;--muted:#66758f;--accent:#485ae8;--line:#e4e9f2;--white:#fff;--green:#0d8968;--danger:#bd4057}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;line-height:1.6}
+    header{background:#182548;color:white;padding:20px max(20px,calc((100vw - 1050px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .logo{font-size:21px;font-weight:800;letter-spacing:.04em}.logo span{color:#aeb8ff}header small{color:#c6d0ef}
+    main{max-width:1050px;margin:38px auto 70px;padding:0 20px}.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:26px;flex-wrap:wrap}
+    h1{margin:0;font-size:clamp(25px,4vw,35px);letter-spacing:-.03em}.sub{color:var(--muted);margin:7px 0 0}.pill{background:#e6ebff;color:#3546c5;padding:8px 13px;border-radius:99px;font-size:12px;font-weight:700}
+    .layout{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.card{background:white;border:1px solid var(--line);border-radius:20px;box-shadow:0 7px 28px #2433610a;padding:25px}
+    h2{margin:0 0 19px;font-size:18px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field{display:flex;flex-direction:column;gap:7px;margin-bottom:15px}.field label{font-size:13px;font-weight:700}
+    input,select{font:inherit;background:#fcfdff;color:var(--ink);border:1px solid #cdd6e7;border-radius:11px;padding:11px 12px;min-width:0;width:100%;outline:none}input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px #485ae820}
+    .hint{color:var(--muted);font-size:12px;margin-top:0}.buttons{display:flex;gap:9px;flex-wrap:wrap}.button{border:0;border-radius:11px;padding:11px 17px;font:inherit;font-weight:700;cursor:pointer}.primary{background:var(--accent);color:white}.secondary{background:#eff2fc;color:#27355c}.button:hover{filter:brightness(.96)}
+    .stat{background:#f0f2ff;border-radius:16px;padding:20px;margin-bottom:15px}.eyebrow{font-size:12px;color:#5362a0;font-weight:700}.money{font-size:38px;font-weight:800;letter-spacing:-.04em;line-height:1.35}.breakdown{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}.breakdown:last-child{border:0}.breakdown span:first-child{color:var(--muted)}.note{font-size:12px;color:var(--muted);margin:17px 0 0}.error{min-height:21px;color:var(--danger);font-size:13px;font-weight:700}
+    .history{margin-top:20px}.historyhead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.historyhead h2{margin:0}.total{font-size:13px;color:var(--muted)}.total strong{color:var(--ink);font-size:21px}
+    .tablewrap{overflow-x:auto;margin-top:17px}table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:13px}th{text-align:left;color:var(--muted);font-weight:600;background:#f6f8fd}th,td{padding:13px 12px;border-bottom:1px solid var(--line)}td:last-child,th:last-child{text-align:right}.del{border:none;background:#fff0f2;color:var(--danger);cursor:pointer;border-radius:7px;padding:6px 10px;font-weight:700}.empty{text-align:center;color:var(--muted);padding:25px}
+    .jobsline{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:end}.jobsline button{margin-bottom:15px}.month-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}.month-controls input{width:auto}.month-stats{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:12px 0}.chart{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:end;gap:10px;height:180px;margin:20px 0 8px}.chart-col{height:100%;display:flex;align-items:center;justify-content:flex-end;flex-direction:column;gap:5px;min-width:0}.chart-bar{background:#6677ef;border-radius:8px 8px 0 0;width:100%;max-width:75px;min-height:2px}.chart-label{font-size:11px;color:var(--muted)}.chart-value{font-size:10px;white-space:nowrap;color:var(--ink)}
+    footer{max-width:1050px;margin:0 auto 35px;padding:0 20px;color:var(--muted);font-size:12px}a{color:var(--accent)}@media(max-width:760px){.layout{grid-template-columns:1fr}.card{padding:19px}.money{font-size:32px}}@media(max-width:420px){.grid{grid-template-columns:1fr}header small{display:none}main{margin-top:23px}}
+  </style>
+</head>
+<body>
+<header><div class="logo">シフト<span>ノート</span></div><small>複数バイト・月別集計にも対応</small></header>
+<main>
+  <div class="hero"><div><h1>今日のバイト、いくら稼いだ？</h1><p class="sub">深夜手当を含めた給与の目安をかんたん計算。</p></div><span class="pill">無料・登録不要</span></div>
+  <div class="layout">
+    <section class="card" aria-labelledby="formtitle">
+      <h2 id="formtitle">勤務内容を入力</h2>
+      <div class="grid"><div class="field"><label for="date">勤務開始日</label><input type="date" id="date" /></div><div class="field"><label for="job">バイト名（任意）</label><input id="job" list="job-options" placeholder="例：居酒屋" maxlength="30" /><datalist id="job-options"></datalist></div></div>
+      <div class="jobsline"><p class="hint">バイト名・時給・割増率を設定したら「勤務先を登録」を押すと、次回からバイト名で呼び出せます。</p><button id="saveJob" class="button secondary" type="button">勤務先を登録</button></div>
+      <div class="grid"><div class="field"><label for="start">出勤時刻</label><input type="time" id="start" value="23:00" /></div><div class="field"><label for="end">退勤時刻</label><input type="time" id="end" value="05:00" /></div></div>
+      <p class="hint">退勤時刻が出勤時刻以前なら、翌日の退勤として計算します。</p>
+      <div class="grid"><div class="field"><label for="wage">基本時給（円）</label><input id="wage" type="number" min="1" max="100000" step="1" value="1350" /></div><div class="field"><label for="premium">深夜割増率（%）</label><input id="premium" type="number" min="0" max="200" step="1" value="25" /></div></div>
+      <div class="grid"><div class="field"><label for="breakStart">休憩開始（任意）</label><input id="breakStart" type="time" /></div><div class="field"><label for="breakEnd">休憩終了（任意）</label><input id="breakEnd" type="time" /></div></div>
+      <p class="hint">休憩は時刻で指定してください。勤務が日付をまたぐ場合も対応。休憩中は給与に含めません。</p>
+      <div class="error" id="error" role="alert" aria-live="polite"></div>
+      <div class="buttons"><button id="calculate" class="button secondary" type="button">再計算</button><button id="save" class="button primary" type="button">この勤務を保存する</button></div>
+    </section>
+    <section class="card" aria-labelledby="resulttitle">
+      <h2 id="resulttitle">計算結果</h2>
+      <div class="stat"><div class="eyebrow">この勤務の概算給与</div><div class="money" id="result">—</div></div>
+      <div class="breakdown"><span>実働時間</span><strong id="hours">—</strong></div>
+      <div class="breakdown"><span>通常時間帯（5:00〜22:00）</span><strong id="normal">—</strong></div>
+      <div class="breakdown"><span>深夜時間帯（22:00〜5:00）</span><strong id="night">—</strong></div>
+      <div class="breakdown"><span>基本給相当</span><strong id="base">—</strong></div>
+      <div class="breakdown"><span>深夜割増分</span><strong id="extra">—</strong></div>
+      <p class="note">※法定時間外・法定休日の割増、交通費、各種手当、控除などは含みません。金額は概算で、実際の給与明細と一致しない場合があります。</p>
+    </section>
+  </div>
+  <section class="card history" aria-labelledby="historytitle"><div class="historyhead"><div><h2 id="historytitle">保存した勤務</h2><div class="total">保存データ全体：<strong id="total">0円</strong></div><div class="month-controls"><label for="month">集計月</label><input id="month" type="month" /></div><div class="month-stats"><span>選択月の給与：<strong id="monthTotal">0円</strong></span><span>勤務回数：<strong id="monthCount">0回</strong></span></div></div><div class="buttons"><button class="button secondary" id="csv" type="button">CSVで保存</button><button class="button secondary" id="clear" type="button">全件削除</button></div></div><div class="chart" id="chart" aria-label="直近6か月の月別給与グラフ"></div><div class="tablewrap"><table><thead><tr><th>日付</th><th>バイト名</th><th>勤務</th><th>実働</th><th>概算給与</th><th>操作</th></tr></thead><tbody id="records"></tbody></table></div><p class="note">データはこのブラウザ内にのみ保存されます。ブラウザのデータを消すと記録も消えるため、必要に応じてCSVを保存してください。</p></section>
+</main>
+<footer>シフトノート｜個人制作の給与目安計算ツール。就業規則や給与明細の確認に代わるものではありません。</footer>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const fmtYen = n => `${Math.round(n).toLocaleString('ja-JP')}円`;
+const fmtMinutes = m => `${Math.floor(m/60)}時間${m%60 ? `${m%60}分` : ''}`;
+const parseTime = text => {if(!/^\d{2}:\d{2}$/.test(text||'')) return null; const [h,m]=text.split(':').map(Number);return h<24&&m<60?h*60+m:null};
+const dateLocal = new Date(); $('date').value = `${dateLocal.getFullYear()}-${String(dateLocal.getMonth()+1).padStart(2,'0')}-${String(dateLocal.getDate()).padStart(2,'0')}`;
+const keys=['date','job','start','end','wage','premium','breakStart','breakEnd'];
+const jobsKey='shift-note-jobs-v2';
+function getJobs(){try{return JSON.parse(localStorage.getItem(jobsKey)||'{}')}catch{return {}}}
+let jobs=getJobs();
+function refreshJobs(){const datalist=$('job-options');datalist.replaceChildren();Object.keys(jobs).sort().forEach(name=>{const option=document.createElement('option');option.value=name;datalist.append(option);});}
+function selectJob(){const saved=jobs[$('job').value.trim()];if(saved){$('wage').value=saved.wage;$('premium').value=saved.premium;}recalc();}
+$('job').addEventListener('change',selectJob);
+$('saveJob').addEventListener('click',()=>{const name=$('job').value.trim();const wage=Number($('wage').value),premium=Number($('premium').value);if(!name||!Number.isFinite(wage)||wage<=0||!Number.isFinite(premium)||premium<0||premium>200){$('error').textContent='勤務先名・時給・割増率を正しく入力してください。';return;}jobs[name]={wage,premium};try{localStorage.setItem(jobsKey,JSON.stringify(jobs));refreshJobs();$('error').textContent=`「${name}」の設定を保存しました。`; }catch{$('error').textContent='勤務先の設定を保存できませんでした。';}});
+refreshJobs();
+$('month').value=$('date').value.slice(0,7);
+$('month').addEventListener('change',render);
+function compute(){
+ const start=parseTime($('start').value), endRaw=parseTime($('end').value);
+ const wage=Number($('wage').value), premium=Number($('premium').value);
+ if(!$('date').value || start===null || endRaw===null || !Number.isFinite(wage) || wage<=0 || !Number.isFinite(premium) || premium<0 || premium>200) throw Error('日付・勤務時間・時給・割増率を正しく入力してください。');
+ let end=endRaw<=start?endRaw+1440:endRaw;
+ if(end-start>1440) throw Error('勤務は24時間以内で入力してください。');
+ let bs=null,be=null;
+ if($('breakStart').value || $('breakEnd').value){
+  if(!$('breakStart').value || !$('breakEnd').value) throw Error('休憩の開始・終了を両方入力してください。');
+  bs=parseTime($('breakStart').value);be=parseTime($('breakEnd').value);
+  if(bs===null||be===null) throw Error('休憩時間を正しく入力してください。');
+  if(bs<start) bs+=1440;
+  if(be<=bs%1440) be+=1440;
+  if(be<=bs) be+=1440;
+  if(bs<start||be>end||bs>=be) throw Error('休憩時間は勤務時間の範囲内で入力してください。');
+ }
+ let mins=0,nightMins=0;
+ for(let minute=start;minute<end;minute++){
+  if(bs!==null&&minute>=bs&&minute<be)continue;
+  mins++;
+  const clock=minute%1440;
+  if(clock>=22*60||clock<5*60)nightMins++;
+ }
+ if(mins<=0)throw Error('実働時間が0分です。');
+ const base=mins/60*wage, extra=nightMins/60*wage*premium/100;
+ return {mins,nightMins,base,extra,pay:Math.round(base+extra), date:$('date').value,job:$('job').value.trim()||'未設定', start:$('start').value,end:$('end').value,wage,premium};
+}
+function recalc(){try{const d=compute();$('error').textContent='';$('result').textContent=fmtYen(d.pay);$('hours').textContent=fmtMinutes(d.mins);$('night').textContent=fmtMinutes(d.nightMins);$('normal').textContent=fmtMinutes(d.mins-d.nightMins);$('base').textContent=fmtYen(d.base);$('extra').textContent=fmtYen(d.extra);return d;}catch(e){$('error').textContent=e.message;['result','hours','night','normal','base','extra'].forEach(x=>$(x).textContent='—');return null}}
+const storeKey='shift-note-records-v1';
+function load(){try{const x=JSON.parse(localStorage.getItem(storeKey)||'[]');return Array.isArray(x)?x:[]}catch{return []}}
+let records=load();
+function persist(){try{localStorage.setItem(storeKey,JSON.stringify(records));return true}catch{$('error').textContent='保存できませんでした。ブラウザのストレージ設定を確認してください。';return false}}
+function render(){
+ const tbody=$('records');tbody.replaceChildren();
+ $('total').textContent=fmtYen(records.reduce((sum,r)=>sum+Number(r.pay||0),0));
+ const month=$('month').value;const filtered=records.filter(r=>String(r.date||'').slice(0,7)===month);
+ $('monthTotal').textContent=fmtYen(filtered.reduce((sum,r)=>sum+Number(r.pay||0),0));
+ $('monthCount').textContent=`${filtered.length}回`;
+ const chart=$('chart');chart.replaceChildren();
+ if(month){const [y,m]=month.split('-').map(Number);const points=[];
+  for(let i=5;i>=0;i--){const dt=new Date(y,m-1-i,1);const ym=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;const total=records.filter(r=>String(r.date||'').startsWith(ym)).reduce((sum,r)=>sum+Number(r.pay||0),0);points.push({ym,total});}
+  const max=Math.max(1,...points.map(p=>p.total));
+  for(const p of points){const col=document.createElement('div');col.className='chart-col';const value=document.createElement('span');value.className='chart-value';value.textContent=p.total?`${Math.round(p.total/1000)}千円`:'';const bar=document.createElement('div');bar.className='chart-bar';bar.style.height=`${Math.max(2,p.total/max*120)}px`;bar.title=`${p.ym}：${fmtYen(p.total)}`;const label=document.createElement('span');label.className='chart-label';label.textContent=`${Number(p.ym.slice(5))}月`;col.append(value,bar,label);chart.append(col);}
+ }
+ if(!filtered.length){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=6;td.className='empty';td.textContent='この月の勤務記録はありません';tr.append(td);tbody.append(tr);return;}
+ [...filtered].reverse().forEach(r=>{const tr=document.createElement('tr');for(const value of [r.date,r.job,`${r.start}〜${r.end}`,fmtMinutes(r.mins),fmtYen(r.pay)]){const td=document.createElement('td');td.textContent=value;tr.append(td)}const td=document.createElement('td'),btn=document.createElement('button');btn.className='del';btn.textContent='削除';btn.type='button';btn.addEventListener('click',()=>{records=records.filter(x=>x.id!==r.id);persist();render()});td.append(btn);tr.append(td);tbody.append(tr)});
+}
+$('calculate').addEventListener('click',recalc);
+keys.forEach(id=>$(id).addEventListener('input',recalc));
+$('save').addEventListener('click',()=>{const d=recalc();if(!d)return;records.push({...d,id:`${Date.now()}-${Math.random().toString(36).slice(2)}`});if(persist()){$('month').value=d.date.slice(0,7);$('error').textContent='勤務を保存しました。';render()}});
+$('clear').addEventListener('click',()=>{if(!records.length)return;if(confirm('保存した勤務をすべて削除しますか？')){records=[];persist();render()}});
+$('csv').addEventListener('click',()=>{if(!records.length){alert('保存済みの勤務がありません。');return;}const rows=[['日付','バイト名','開始','終了','実働分','深夜分','時給','深夜割増率','概算給与'],...records.map(r=>[r.date,r.job,r.start,r.end,r.mins,r.nightMins,r.wage,r.premium,r.pay])];const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='shift-note.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+recalc();render();
+</script>
+</body>
+</html>
